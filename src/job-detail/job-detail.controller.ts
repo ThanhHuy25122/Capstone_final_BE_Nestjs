@@ -8,16 +8,15 @@ import {
   Delete,
 } from '@nestjs/common';
 import { JobDetailService } from './job-detail.service';
-import { CreateJobDetailDto } from './dto/create-job-detail.dto';
-import { UpdateJobDetailDto } from './dto/update-job-detail.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { JobDetail } from './entities/job-detail.entity';
 @ApiTags('JOB DETAIL')
 @Controller('job-detail')
 export class JobDetailController {
   constructor(private readonly jobDetailService: JobDetailService) {}
 
   @Post()
-  create(@Body() createJobDetailDto: CreateJobDetailDto) {
+  create(@Body() createJobDetailDto: JobDetail) {
     return this.jobDetailService.create(createJobDetailDto);
   }
 
@@ -26,21 +25,21 @@ export class JobDetailController {
     return this.jobDetailService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.jobDetailService.findOne(+id);
+  @Get(':jobDetailId')
+  findOne(@Param('jobDetailId') jobDetailId: string) {
+    return this.jobDetailService.findOne(+jobDetailId);
   }
 
-  @Patch(':id')
+  @Patch(':jobDetailId')
   update(
-    @Param('id') id: string,
-    @Body() updateJobDetailDto: UpdateJobDetailDto,
+    @Param('jobDetailId') jobDetailId: string,
+    @Body() updateJobDetailDto: JobDetail,
   ) {
-    return this.jobDetailService.update(+id, updateJobDetailDto);
+    return this.jobDetailService.update(+jobDetailId, updateJobDetailDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.jobDetailService.remove(+id);
+  @Delete(':jobDetailId')
+  remove(@Param('jobDetailId') jobDetailId: string) {
+    return this.jobDetailService.remove(+jobDetailId);
   }
 }

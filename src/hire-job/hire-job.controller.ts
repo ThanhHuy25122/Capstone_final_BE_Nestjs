@@ -8,9 +8,8 @@ import {
   Delete,
 } from '@nestjs/common';
 import { HireJobService } from './hire-job.service';
-import { CreateHireJobDto } from './dto/create-hire-job.dto';
-import { UpdateHireJobDto } from './dto/update-hire-job.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { HireJob } from './entities/hire-job.entity';
 
 @ApiTags('HIRE JOB')
 @Controller('hire-job')
@@ -18,7 +17,7 @@ export class HireJobController {
   constructor(private readonly hireJobService: HireJobService) {}
 
   @Post()
-  create(@Body() createHireJobDto: CreateHireJobDto) {
+  create(@Body() createHireJobDto: HireJob) {
     return this.hireJobService.create(createHireJobDto);
   }
 
@@ -27,18 +26,21 @@ export class HireJobController {
     return this.hireJobService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.hireJobService.findOne(+id);
+  @Get(':hireJobId')
+  findOne(@Param('hireJobId') hireJobId: string) {
+    return this.hireJobService.findOne(+hireJobId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateHireJobDto: UpdateHireJobDto) {
-    return this.hireJobService.update(+id, updateHireJobDto);
+  @Patch(':hireJobId')
+  update(
+    @Param('hireJobId') hireJobId: string,
+    @Body() updateHireJobDto: HireJob,
+  ) {
+    return this.hireJobService.update(+hireJobId, updateHireJobDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.hireJobService.remove(+id);
+  @Delete(':hireJobId')
+  remove(@Param('hireJobId') hireJobId: string) {
+    return this.hireJobService.remove(+hireJobId);
   }
 }

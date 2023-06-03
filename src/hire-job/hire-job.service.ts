@@ -1,26 +1,133 @@
 import { Injectable } from '@nestjs/common';
-import { CreateHireJobDto } from './dto/create-hire-job.dto';
-import { UpdateHireJobDto } from './dto/update-hire-job.dto';
+import { HireJob } from './entities/hire-job.entity';
+import { PrismaClient } from '@prisma/client';
+import { MyResponse } from 'src/interface/response.dto';
+import { errorCode, failCode, successCode } from 'src/config/response';
 
 @Injectable()
 export class HireJobService {
-  create(createHireJobDto: CreateHireJobDto) {
-    return 'This action adds a new hireJob';
+  prisma = new PrismaClient();
+
+  async create(hireJob: HireJob): Promise<MyResponse<HireJob | any>> {
+    if (hireJob.id) {
+      return errorCode({}, 'Please do not enter an ID.');
+    }
+
+    const checkUserId = await this.prisma.nguoiDung?.findFirst({
+      where: {
+        id: hireJob?.ma_nguoi_thue,
+      },
+    });
+    if (!checkUserId) {
+      return errorCode({}, 'The user does not exist!');
+    }
+
+    const checkHireJob = await this.prisma.congViec?.findFirst({
+      where: {
+        id: hireJob?.ma_cong_viec,
+      },
+    });
+    if (checkHireJob) {
+      return errorCode({}, 'The job already exists!');
+    }
+
+    const createHireJob = await this.prisma.thueCongViec?.create({
+      data: hireJob,
+    });
+
+    if (createHireJob) {
+      return successCode(createHireJob, 'Hire job successfully created!');
+    }
+    return failCode();
   }
 
-  findAll() {
-    return `This action returns all hireJob`;
+  async findAll(): Promise<MyResponse<HireJob[]>> {
+    const data = await this.prisma.congViec?.findMany();
+    if (!data) {
+      return errorCode({}, 'There are no jobs available.');
+    }
+    return successCode(data, 'Get job successfully!');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} hireJob`;
+  async findOne(hireJobId: number): Promise<HireJob> {
+    if (!hireJobId) {
+      return errorCode({}, 'Please enter the ID address as a number.');
+    }
+
+    const checkHireJob = await this.prisma.congViec?.findFirst({
+      where: { id: hireJobId },
+    });
+
+    if (!checkHireJob) {
+      return errorCode({}, 'Hire job not found!');
+    }
+
+    return successCode(checkHireJob, 'Find job successfully!');
   }
 
-  update(id: number, updateHireJobDto: UpdateHireJobDto) {
-    return `This action updates a #${id} hireJob`;
+  async update(
+    hireJobId: number,
+    updateHireJob: HireJob,
+  ): Promise<MyResponse<HireJob | null>> {
+    if (!hireJobId) {
+      return errorCode({}, 'Please enter the ID address as a number.');
+    }
+
+    const checkHireJobById = await this.prisma.congViec.findFirst({
+      where: { id: hireJobId },
+    });
+
+    if (!checkHireJobById) {
+      return errorCode({}, 'Hire job not found!');
+    }
+
+    const checkHireJobDetailId = await this.prisma.congViec.findFirst({
+      where: { id: updateHireJob.ma_cong_viec },
+    });
+
+    if (!checkHireJobDetailId) {
+      return errorCode({}, 'Hire job detail not found!');
+    }
+
+    const checkUserId = await this.prisma.nguoiDung.findFirst({
+      where: { id: updateHireJob.ma_nguoi_thue },
+    });
+
+    if (!checkUserId) {
+      return errorCode({}, 'User not found!');
+    }
+
+    const updatedHireJob = await this.prisma.congViec.update({
+      where: { id: hireJobId },
+      data: updateHireJob,
+    });
+
+    if (updatedHireJob) {
+      return successCode(updatedHireJob, 'Update job successfully!');
+    }
+
+    return failCode();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} hireJob`;
+  async remove(hireJobId: number): Promise<MyResponse<null>> {
+    if (!hireJobId) {
+      return errorCode({}, 'Please enter the ID address as a number.');
+    }
+
+    const checkHireJobById = await this.prisma.congViec?.findFirst({
+      where: { id: hireJobId },
+    });
+
+    if (!checkHireJobById) {
+      return errorCode({}, 'Hire job not found!');
+    }
+
+    const deleteHireJob = await this.prisma.congViec?.delete({
+      where: { id: hireJobId },
+    });
+    if (deleteHireJob) {
+      return successCode({}, 'Delete job successfully!');
+    }
+    return errorCode({}, 'Delete job failed. You not valid !');
   }
 }

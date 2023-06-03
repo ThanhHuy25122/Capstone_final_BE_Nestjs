@@ -33,8 +33,8 @@ export const failCode = (message: string = 'Internal Server Error') => {
   throw new HttpException(
     {
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-
       message: message,
+      content: {},
     },
     HttpStatus.INTERNAL_SERVER_ERROR,
   );

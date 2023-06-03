@@ -35,7 +35,7 @@ model ChiTietCongViec {
 model CongViec {
   id               Int             @id @default(autoincrement())
   ten_cong_viec    String          @db.VarChar(255)
-  dang_gia         Int
+  danh_gia         Int
   gia_tien         Int
   hinh_anh         String          @db.VarChar(255)
   mo_ta            String          @db.VarChar(255)

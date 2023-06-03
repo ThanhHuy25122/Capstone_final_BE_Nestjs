@@ -1,11 +1,11 @@
-import { PrismaClient, NguoiDung } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { ConfigService } from '@nestjs/config/dist';
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 
 import { JwtService } from '@nestjs/jwt';
 import { UserLogin } from './entities/auth.entity';
 import { errorCode, failCode, successCode } from 'src/config/response';
-import { Response } from 'src/interface/response.dto';
+import { MyResponse } from 'src/interface/response.dto';
 import { UserDto } from 'src/user/entities/user.entity';
 
 class ResponseAuthLogin extends UserLogin {
@@ -20,7 +20,7 @@ export class AuthService {
 
   async login(
     userLogin: UserLogin,
-  ): Promise<Response<ResponseAuthLogin> | any> {
+  ): Promise<MyResponse<ResponseAuthLogin> | any> {
     // check email
     const checkEmail = await this.prisma.nguoiDung.findFirst({
       where: {
@@ -53,7 +53,7 @@ export class AuthService {
     return successCode({ ...userLogin, token }, 'Login success!');
   }
 
-  async register(userSignup: UserDto): Promise<Response<UserDto>> {
+  async register(userSignup: UserDto): Promise<MyResponse<UserDto>> {
     const checkEmail = await this.prisma.nguoiDung.findFirst({
       where: { email: userSignup.email },
     });
